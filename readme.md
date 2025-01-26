@@ -24,19 +24,11 @@ Follow these steps to set up and run the project:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/flappy-bird-neat.git
-cd flappy-bird-neat
+git clone https://github.com/DkrDante/Flappy
+cd flappy
 ```
 
-### 2. Install Dependencies
-
-Install the required Python packages using pip:
-
-```bash
-pip install -r requirements.txt
-```
-
-### 3. Add Game Assets
+### 2. Add Game Assets
 
 Ensure the following image files are in the `imgs` directory:
 
@@ -45,11 +37,11 @@ Ensure the following image files are in the `imgs` directory:
 - `bird1.png`, `bird2.png`, `bird3.png`
 - `base.png`
 
-### 4. Configure NEAT
+### 3. Configure NEAT
 
 Ensure the `config-feedforward.txt` file is present in the project directory. This file contains the NEAT configuration for the neural network.
 
-### 5. Run the Game
+### 4. Run the Game
 
 To start the game, execute:
 
