@@ -1,95 +1,257 @@
-# Flappy Bird AI using NEAT
+# 🐦 Enhanced Flappy Bird with AI Training
 
-This project is an implementation of the Flappy Bird game integrated with a neural network using the NEAT (NeuroEvolution of Augmenting Topologies) algorithm. The AI learns to play Flappy Bird by evolving its strategies over generations.
+A comprehensive Flappy Bird implementation featuring both human gameplay and AI training using the NEAT (NeuroEvolution of Augmenting Topologies) algorithm.
 
-## Features
+## 🎮 Features
 
-- Flappy Bird gameplay.
-- AI-controlled birds using NEAT.
-- Dynamic pipe generation.
-- High-score tracking.
-- Visualization of AI learning progress.
+### Core Gameplay
 
-## Prerequisites
+- **Classic Flappy Bird mechanics** with smooth physics
+- **Human playable mode** with high score tracking
+- **AI training mode** using NEAT algorithm
+- **Multiple difficulty levels** that scale with performance
+- **Power-up system** (shields, slow motion, double points)
 
-Ensure you have the following installed:
+### AI & Machine Learning
 
-- Python 3.7 or higher
-- pip (Python package manager)
+- **NEAT algorithm implementation** for neural network evolution
+- **Real-time AI training visualization**
+- **Neural network analysis tools**
+- **Training statistics and progress tracking**
+- **Best AI model saving and loading**
 
-## Installation Guide
+### User Interface
 
-Follow these steps to set up and run the project:
+- **Main menu system** with multiple game modes
+- **Settings configuration** with persistent storage
+- **Leaderboard system** with player statistics
+- **AI network visualization** tools
+- **Training progress graphs**
 
-### 1. Clone the Repository
+## 🚀 Getting Started
 
-```bash
-git clone https://github.com/DkrDante/Flappy
-cd flappy
-```
-
-### 2. Add Game Assets
-
-Ensure the following image files are in the `imgs` directory:
-
-- `pipe.png`
-- `bg.png`
-- `bird1.png`, `bird2.png`, `bird3.png`
-- `base.png`
-
-### 3. Configure NEAT
-
-Ensure the `config-feedforward.txt` file is present in the project directory. This file contains the NEAT configuration for the neural network.
-
-### 4. Run the Game
-
-To start the game, execute:
+### Prerequisites
 
 ```bash
-python flappy_bird.py
+pip install pygame neat-python matplotlib numpy
 ```
 
-## How it Works
+### Installation
 
-1. **Initialization**: The AI birds are initialized with random weights and biases.
-2. **Fitness Evaluation**: Each bird's performance is evaluated based on its ability to pass through pipes.
-3. **Evolution**: NEAT evolves the neural networks by applying mutations and crossover to improve performance over generations.
-4. **Game Loop**: The game loop updates the birds' positions, checks for collisions, and renders the graphics.
+1. Clone the repository
+2. Install dependencies
+3. Run the main menu:
 
-## Key Files
+```bash
+# Graphical Menu (Recommended)
+python menu.py
 
-- `flappy_bird.py`: Main game logic and AI integration.
-- `config-feedforward.txt`: Configuration for the NEAT algorithm.
-- `imgs/`: Directory containing game assets.
-- `requirements.txt`: List of Python dependencies.
+# Command Line Launcher (Alternative)
+python launcher.py
+```
 
-## Controls
+## 📁 Project Structure
 
-- The AI controls the birds automatically.
-- Use `ESC` or close the window to quit the game.
+```
+flappy/
+├── flappy_bird.py          # Main AI training game
+├── human_mode.py           # Human playable version
+├── menu.py                 # Graphical main menu system
+├── launcher.py             # Command-line launcher
+├── settings.py             # Settings configuration
+├── leaderboard.py          # Leaderboard system
+├── ai_analyzer.py          # AI analysis tools
+├── visualize.py            # NEAT visualization
+├── config-feedforward.txt  # NEAT configuration
+├── best.pickle            # Best trained AI model
+├── imgs/                  # Game assets
+└── README.md              # This file
+```
 
-## Notes
+## 🎯 Game Modes
 
-- Modify the NEAT configuration file (`config-feedforward.txt`) to tweak the neural network parameters.
-- The game will save the best-performing neural network to a file named `best.pickle` if the score exceeds 20.
+### 1. Human Mode (`human_mode.py`)
 
-## Dependencies
+- Classic Flappy Bird gameplay
+- High score tracking
+- Restart functionality
+- Space bar to jump
 
-The project uses the following Python libraries:
+### 2. AI Training Mode (`flappy_bird.py`)
 
-- `pygame`: For game development.
-- `neat-python`: For implementing the NEAT algorithm.
-- `pickle`: For saving and loading the best-performing neural network.
+- NEAT algorithm training
+- Population evolution
+- Fitness tracking
+- Automatic model saving
 
-## License
+### 3. AI Analyzer (`ai_analyzer.py`)
 
-This project is licensed under the MIT License. See the `LICENSE` file for details.
+- Analyze trained AI networks
+- Visualize neural network structure
+- View training statistics
+- Performance analysis
 
-## Acknowledgments
+### 4. Leaderboard (`leaderboard.py`)
 
-- Inspired by the Flappy Bird game.
-- Uses the NEAT algorithm for AI evolution.
+- View high scores and statistics
+- Filter by game mode
+- Player performance tracking
+- Persistent score storage
+
+### 5. Settings (`settings.py`)
+
+- Configure game options
+- Adjust AI parameters
+- Customize difficulty levels
+- Persistent settings storage
+
+## ⚙️ Settings
+
+### Game Settings
+
+- **Difficulty**: Easy, Normal, Hard
+- **Sound**: On/Off toggle
+- **Music Volume**: 0.3 - 0.9
+- **AI Population Size**: 50 - 200
+- **AI Speed**: 5 - 20
+- **Show Lines**: Visualize AI decision making
+- **Auto Save**: Automatic progress saving
+
+### Controls
+
+#### Menu Navigation
+
+- **Arrow Keys**: Navigate menu options
+- **Number Keys (1-6)**: Quick selection
+- **Enter/Space**: Confirm selection
+- **ESC**: Exit/Back
+
+#### Game Controls
+
+- **Space**: Jump (in game)
+- **ESC**: Exit game
+
+## 🤖 AI Training
+
+### NEAT Configuration
+
+The AI uses a feedforward neural network with:
+
+- **2 Input nodes**: Bird Y position, Distance to pipe
+- **1 Output node**: Jump decision
+- **Population size**: Configurable (default: 100)
+- **Fitness function**: Distance traveled + pipes passed
+
+### Training Process
+
+1. Initialize random population
+2. Evaluate fitness for each bird
+3. Select best performers
+4. Crossover and mutate
+5. Repeat for specified generations
+
+### Visualization
+
+- Real-time training progress
+- Neural network structure display
+- Fitness evolution graphs
+- Species diversity tracking
+
+## 📊 Leaderboard System
+
+### Features
+
+- **Top 10 scores** tracking
+- **Mode filtering** (Human/AI/All)
+- **Player statistics**
+- **Date and time stamps**
+- **Persistent storage**
+
+### Score Categories
+
+- **Human Mode**: Manual gameplay scores
+- **AI Mode**: Best AI performance scores
+- **All**: Combined leaderboard
+
+## 🔧 Customization
+
+### Adding New Features
+
+1. **Power-ups**: Modify `enhanced_game.py`
+2. **Difficulty levels**: Adjust pipe generation in `Pipe` class
+3. **AI inputs**: Modify input nodes in NEAT config
+4. **Visual effects**: Add to drawing functions
+
+### Configuration Files
+
+- `config-feedforward.txt`: NEAT algorithm parameters
+- `game_settings.json`: User preferences
+- `leaderboard.json`: Score data
+- `best.pickle`: Trained AI model
+
+## 📈 Performance Tips
+
+### For AI Training
+
+- Start with smaller population (50-100)
+- Use moderate mutation rates
+- Monitor fitness stagnation
+- Save best models regularly
+
+### For Human Play
+
+- Practice timing and rhythm
+- Learn pipe patterns
+- Use power-ups strategically
+- Focus on consistency
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Missing images**: Ensure `imgs/` folder contains all assets
+2. **NEAT import error**: Install `neat-python` package
+3. **Performance issues**: Reduce AI population size
+4. **Save file errors**: Check file permissions
+
+### Debug Mode
+
+Enable debug features by modifying:
+
+- `DRAW_LINES = True` in `flappy_bird.py`
+- Increase AI speed for faster training
+- Add console logging for detailed output
+
+## 🤝 Contributing
+
+### Adding Features
+
+1. Fork the repository
+2. Create feature branch
+3. Implement changes
+4. Test thoroughly
+5. Submit pull request
+
+### Suggested Enhancements
+
+- **Sound effects and music**
+- **More power-up types**
+- **Multiplayer mode**
+- **Advanced AI algorithms**
+- **Mobile support**
+- **Level editor**
+
+## 📝 License
+
+This project is open source and available under the MIT License.
+
+## 🙏 Acknowledgments
+
+- Original Flappy Bird game concept
+- NEAT algorithm by Kenneth Stanley
+- Pygame community
+- Open source contributors
 
 ---
 
-Enjoy the game and watch the AI learn to master Flappy Bird!
+**Happy Flapping! 🐦✨**

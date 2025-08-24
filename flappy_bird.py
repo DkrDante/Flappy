@@ -1,4 +1,3 @@
-
 import pygame
 import random
 import os
@@ -6,7 +5,8 @@ import time
 import neat
 import visualize
 import pickle
-pygame.font.init()  
+
+pygame.font.init()
 
 WIN_WIDTH = 600
 WIN_HEIGHT = 800
@@ -16,27 +16,54 @@ END_FONT = pygame.font.SysFont("comicsans", 70)
 DRAW_LINES = False
 
 WIN = pygame.display.set_mode((WIN_WIDTH, WIN_HEIGHT))
-pygame.display.set_caption("Flappy Bird")
+pygame.display.set_caption("Flappy Bird AI Training")
 
-pipe_img = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","pipe.png")).convert_alpha())
-bg_img = pygame.transform.scale(pygame.image.load(os.path.join("imgs","bg.png")).convert_alpha(), (600, 900))
-bird_images = [pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","bird" + str(x) + ".png"))) for x in range(1,4)]
-base_img = pygame.transform.scale2x(pygame.image.load(os.path.join("imgs","base.png")).convert_alpha())
+pipe_img = pygame.transform.scale2x(
+    pygame.image.load(os.path.join("imgs", "pipe.png")).convert_alpha()
+)
+bg_img = pygame.transform.scale(
+    pygame.image.load(os.path.join("imgs", "bg.png")).convert_alpha(), (600, 900)
+)
+bird_images = [
+    pygame.transform.scale2x(
+        pygame.image.load(os.path.join("imgs", "bird" + str(x) + ".png"))
+    )
+    for x in range(1, 4)
+]
+base_img = pygame.transform.scale2x(
+    pygame.image.load(os.path.join("imgs", "base.png")).convert_alpha()
+)
 
 gen = 0
 
-class Bird:
+# Global AI training high score (separate from human high score)
+ai_high_score = 0
 
+def load_ai_high_score():
+    """Load AI training high score"""
+    global ai_high_score
+    try:
+        with open("ai_high_score.txt", "r") as f:
+            ai_high_score = int(f.read())
+    except:
+        ai_high_score = 0
+
+def save_ai_high_score():
+    """Save AI training high score"""
+    global ai_high_score
+    with open("ai_high_score.txt", "w") as f:
+        f.write(str(ai_high_score))
+
+class Bird:
     MAX_ROTATION = 25
     IMGS = bird_images
     ROT_VEL = 20
     ANIMATION_TIME = 5
 
     def __init__(self, x, y):
-        
         self.x = x
         self.y = y
-        self.tilt = 0  
+        self.tilt = 0
         self.tick_count = 0
         self.vel = 0
         self.height = self.y
@@ -49,71 +76,58 @@ class Bird:
         self.height = self.y
 
     def move(self):
-
         self.tick_count += 1
 
-
-        displacement = self.vel*(self.tick_count) + 0.5*(3)*(self.tick_count)**2 
-
+        displacement = self.vel * (self.tick_count) + 0.5 * (3) * (self.tick_count) ** 2
 
         if displacement >= 16:
-            displacement = (displacement/abs(displacement)) * 16
+            displacement = (displacement / abs(displacement)) * 16
 
         if displacement < 0:
             displacement -= 2
 
         self.y = self.y + displacement
 
-        if displacement < 0 or self.y < self.height + 50: 
+        if displacement < 0 or self.y < self.height + 50:
             if self.tilt < self.MAX_ROTATION:
                 self.tilt = self.MAX_ROTATION
-        else:  
+        else:
             if self.tilt > -90:
                 self.tilt -= self.ROT_VEL
 
     def draw(self, win):
-      
-
         self.img_count += 1
-
 
         if self.img_count <= self.ANIMATION_TIME:
             self.img = self.IMGS[0]
-        elif self.img_count <= self.ANIMATION_TIME*2:
+        elif self.img_count <= self.ANIMATION_TIME * 2:
             self.img = self.IMGS[1]
-        elif self.img_count <= self.ANIMATION_TIME*3:
+        elif self.img_count <= self.ANIMATION_TIME * 3:
             self.img = self.IMGS[2]
-        elif self.img_count <= self.ANIMATION_TIME*4:
+        elif self.img_count <= self.ANIMATION_TIME * 4:
             self.img = self.IMGS[1]
-        elif self.img_count == self.ANIMATION_TIME*4 + 1:
+        elif self.img_count == self.ANIMATION_TIME * 4 + 1:
             self.img = self.IMGS[0]
             self.img_count = 0
 
-
         if self.tilt <= -80:
             self.img = self.IMGS[1]
-            self.img_count = self.ANIMATION_TIME*2
-
-
+            self.img_count = self.ANIMATION_TIME * 2
 
         blitRotateCenter(win, self.img, (self.x, self.y), self.tilt)
 
     def get_mask(self):
-
         return pygame.mask.from_surface(self.img)
 
 
-class Pipe():
-
-    GAP = 200
+class Pipe:
+    GAP = 200  # Back to original gap for more challenge
     VEL = 5
 
     def __init__(self, x):
-
         self.x = x
         self.height = 0
 
-       
         self.top = 0
         self.bottom = 0
 
@@ -125,22 +139,17 @@ class Pipe():
         self.set_height()
 
     def set_height(self):
-
-        self.height = random.randrange(50, 450)
+        self.height = random.randrange(50, 450)  # Back to original range
         self.top = self.height - self.PIPE_TOP.get_height()
         self.bottom = self.height + self.GAP
 
     def move(self):
-
         self.x -= self.VEL
 
     def draw(self, win):
-
-
         win.blit(self.PIPE_TOP, (self.x, self.top))
 
         win.blit(self.PIPE_BOTTOM, (self.x, self.bottom))
-
 
     def collide(self, bird, win):
         bird_mask = bird.get_mask()
@@ -150,27 +159,25 @@ class Pipe():
         bottom_offset = (self.x - bird.x, self.bottom - round(bird.y))
 
         b_point = bird_mask.overlap(bottom_mask, bottom_offset)
-        t_point = bird_mask.overlap(top_mask,top_offset)
+        t_point = bird_mask.overlap(top_mask, top_offset)
 
         if b_point or t_point:
             return True
 
         return False
 
-class Base:
 
+class Base:
     VEL = 5
     WIDTH = base_img.get_width()
     IMG = base_img
 
     def __init__(self, y):
-
         self.y = y
         self.x1 = 0
         self.x2 = self.WIDTH
 
     def move(self):
-        
         self.x1 -= self.VEL
         self.x2 -= self.VEL
         if self.x1 + self.WIDTH < 0:
@@ -180,85 +187,105 @@ class Base:
             self.x2 = self.x1 + self.WIDTH
 
     def draw(self, win):
-        
         win.blit(self.IMG, (self.x1, self.y))
         win.blit(self.IMG, (self.x2, self.y))
 
 
 def blitRotateCenter(surf, image, topleft, angle):
-  
     rotated_image = pygame.transform.rotate(image, angle)
-    new_rect = rotated_image.get_rect(center = image.get_rect(topleft = topleft).center)
+    new_rect = rotated_image.get_rect(center=image.get_rect(topleft=topleft).center)
 
     surf.blit(rotated_image, new_rect.topleft)
 
-def draw_window(win, birds, pipes, base, score, gen, pipe_ind,hgscore):
-    
+
+def draw_window(win, birds, pipes, base, score, gen, pipe_ind, hgscore):
     if gen == 0:
         gen = 1
-    win.blit(bg_img, (0,0))
+    win.blit(bg_img, (0, 0))
 
     for pipe in pipes:
         pipe.draw(win)
 
     base.draw(win)
     for bird in birds:
-
         if DRAW_LINES:
             try:
-                pygame.draw.line(win, (255,0,0), (bird.x+bird.img.get_width()/2, bird.y + bird.img.get_height()/2), (pipes[pipe_ind].x + pipes[pipe_ind].PIPE_TOP.get_width()/2, pipes[pipe_ind].height), 5)
-                pygame.draw.line(win, (255,0,0), (bird.x+bird.img.get_width()/2, bird.y + bird.img.get_height()/2), (pipes[pipe_ind].x + pipes[pipe_ind].PIPE_BOTTOM.get_width()/2, pipes[pipe_ind].bottom), 5)
+                pygame.draw.line(
+                    win,
+                    (255, 0, 0),
+                    (
+                        bird.x + bird.img.get_width() / 2,
+                        bird.y + bird.img.get_height() / 2,
+                    ),
+                    (
+                        pipes[pipe_ind].x + pipes[pipe_ind].PIPE_TOP.get_width() / 2,
+                        pipes[pipe_ind].height,
+                    ),
+                    5,
+                )
+                pygame.draw.line(
+                    win,
+                    (255, 0, 0),
+                    (
+                        bird.x + bird.img.get_width() / 2,
+                        bird.y + bird.img.get_height() / 2,
+                    ),
+                    (
+                        pipes[pipe_ind].x + pipes[pipe_ind].PIPE_BOTTOM.get_width() / 2,
+                        pipes[pipe_ind].bottom,
+                    ),
+                    5,
+                )
             except:
                 pass
         # draw bird
         bird.draw(win)
 
     # score
-    score_label = STAT_FONT.render("Score: " + str(score),1,(255,255,255))
+    score_label = STAT_FONT.render("Score: " + str(score), 1, (255, 255, 255))
     win.blit(score_label, (WIN_WIDTH - score_label.get_width() - 15, 10))
-    
-    #highscore 
-    score_label=STAT_FONT.render("High Score: "+str(hgscore),1,(255,255,255))
-    win.blit(score_label, (WIN_WIDTH - score_label.get_width()-10,90))
+
+    # AI training high score (separate from human high score)
+    score_label = STAT_FONT.render("AI Best: " + str(hgscore), 1, (255, 255, 255))
+    win.blit(score_label, (WIN_WIDTH - score_label.get_width() - 10, 90))
 
     # generations
-    score_label = STAT_FONT.render("Gens: " + str(gen-1),1,(255,255,255))
+    score_label = STAT_FONT.render("Gens: " + str(gen - 1), 1, (255, 255, 255))
     win.blit(score_label, (10, 10))
 
     # alive
-    score_label = STAT_FONT.render("Alive: " + str(len(birds)),1,(255,255,255))
+    score_label = STAT_FONT.render("Alive: " + str(len(birds)), 1, (255, 255, 255))
     win.blit(score_label, (10, 50))
 
     pygame.display.update()
 
 
 def eval_genomes(genomes, config):
-
-    global WIN, gen
+    global WIN, gen, ai_high_score
     win = WIN
     gen += 1
-
 
     nets = []
     birds = []
     ge = []
     for genome_id, genome in genomes:
-        genome.fitness = 0  
+        genome.fitness = 0
         net = neat.nn.FeedForwardNetwork.create(genome, config)
         nets.append(net)
-        birds.append(Bird(230,350))
+        birds.append(Bird(230, 350))
         ge.append(genome)
 
     base = Base(FLOOR)
     pipes = [Pipe(700)]
     score = 0
-    hgscore = 0 
+    # Don't reset the AI high score - keep it persistent across generations
+    current_ai_high = ai_high_score
 
     clock = pygame.time.Clock()
 
     run = True
     while run and len(birds) > 0:
-        clock.tick(200)
+        clock.tick(30)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -269,17 +296,32 @@ def eval_genomes(genomes, config):
 
         pipe_ind = 0
         if len(birds) > 0:
-            if len(pipes) > 1 and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width():  
-                pipe_ind = 1                                                                
+            if (
+                len(pipes) > 1
+                and birds[0].x > pipes[0].x + pipes[0].PIPE_TOP.get_width()
+            ):
+                pipe_ind = 1
 
-        for x, bird in enumerate(birds): 
+        for x, bird in enumerate(birds):
             ge[x].fitness += 0.1
             bird.move()
 
+            # Simplified inputs - only 3 essential parameters
+            # 1. Bird Y position (where the bird is)
+            # 2. Distance to pipe bottom (how far from bottom pipe)
+            # 3. Bird velocity (how fast bird is falling/rising)
+            
+            next_pipe = pipes[pipe_ind]
+            
+            inputs = (
+                bird.y,  # Bird Y position
+                abs(bird.y - next_pipe.bottom),  # Distance to pipe bottom
+                bird.vel  # Bird velocity
+            )
 
-            output = nets[birds.index(bird)].activate((bird.y,abs(bird.y - pipes[pipe_ind].bottom)))
+            output = nets[birds.index(bird)].activate(inputs)
 
-            if output[0] > 0.5: 
+            if output[0] > 0.5:
                 bird.jump()
 
         base.move()
@@ -305,7 +347,11 @@ def eval_genomes(genomes, config):
 
         if add_pipe:
             score += 1
-            hgscore+=1
+            # Update AI high score if current score is higher
+            if score > current_ai_high:
+                current_ai_high = score
+                ai_high_score = score
+                save_ai_high_score()
 
             for genome in ge:
                 genome.fitness += 5
@@ -320,36 +366,38 @@ def eval_genomes(genomes, config):
                 ge.pop(birds.index(bird))
                 birds.pop(birds.index(bird))
 
-        draw_window(WIN, birds, pipes, base, score, gen, pipe_ind,hgscore)
+        draw_window(WIN, birds, pipes, base, score, gen, pipe_ind, current_ai_high)
 
+        # Remove early termination - let AI train for full generations
+        # Only save best model periodically
+        if score > 50 and score % 10 == 0:  # Save every 10 points after 50
+            pickle.dump(nets[0], open("best.pickle", "wb"))
 
-            if score > 20:
-            pickle.dump(nets[0],open("best.pickle", "wb"))
-            break
 
 def run(config_file):
-    config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction,
-                         neat.DefaultSpeciesSet, neat.DefaultStagnation,
-                         config_file)
-
+    # Load AI high score at the start
+    load_ai_high_score()
+    
+    config = neat.config.Config(
+        neat.DefaultGenome,
+        neat.DefaultReproduction,
+        neat.DefaultSpeciesSet,
+        neat.DefaultStagnation,
+        config_file,
+    )
 
     p = neat.Population(config)
-
 
     p.add_reporter(neat.StdOutReporter(True))
     stats = neat.StatisticsReporter()
     p.add_reporter(stats)
 
-
-
     winner = p.run(eval_genomes, 50)
 
+    print("\nBest genome:\n{!s}".format(winner))
 
-    print('\nBest genome:\n{!s}'.format(winner))
 
-
-if __name__ == '__main__':
-
+if __name__ == "__main__":
     local_dir = os.path.dirname(__file__)
-    config_path = os.path.join(local_dir, 'config-feedforward.txt')
+    config_path = os.path.join(local_dir, "config-feedforward.txt")
     run(config_path)
